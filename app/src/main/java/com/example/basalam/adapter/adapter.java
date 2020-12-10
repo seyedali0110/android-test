@@ -1,61 +1,65 @@
 package com.example.basalam.adapter;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.model.GlideUrl;
+import com.bumptech.glide.load.model.LazyHeaders;
 import com.example.basalam.R;
-import com.example.basalam.datamodel.Getset;
-import com.squareup.picasso.Picasso;
+import com.example.basalam.model.Data;
+
 import java.util.List;
 
-public class adapter extends RecyclerView.Adapter<adapter.viewholder> {
-    private Context context;
-    List<Getset> data;
-    public adapter(Context context, List<Getset> data){
-        this.context=context;
-        this.data=data;
+public class adapter extends RecyclerView.Adapter<adapter.ViewHolder> {
+    private final List<Data> data;
+
+    public adapter(List<Data> data) {
+        this.data = data;
     }
 
     @NonNull
     @Override
-    public viewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v= LayoutInflater.from(context).inflate(R.layout.card_view,parent,false);
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_view, parent, false);
 
-        return new viewholder(v);
+        return new ViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(viewholder holder, int position) {
-        final Getset getset=data.get(position);
-        holder.title.setText(getset.getTitle());
-        Picasso.with(context).load(getset.getUrlimg()).into(holder.image);
-        //Glide.with(context).load(getset.getUrlimg()).into(holder.image);
-    }
+    public void onBindViewHolder(ViewHolder holder, int position) {
+        final Data data = this.data.get(position);
+        holder.title.setText(data.getTitle());
 
+        GlideUrl url = new GlideUrl(data.getImageAddress(), new LazyHeaders.Builder()
+                .addHeader("User-Agent", "User-Agent")
+                .build());
+
+        Glide.with(holder.itemView.getContext())
+                .load(url)
+                .into(holder.image);
+    }
 
     @Override
     public int getItemCount() {
         return data.size();
     }
 
-    public class viewholder extends RecyclerView.ViewHolder
-    {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
-       public ImageView image;
-       public TextView title;
+        private final ImageView image;
+        private final TextView title;
 
-        public viewholder(@NonNull View itemView) {
+        public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            title =(TextView)itemView.findViewById(R.id.txt_title);
-            image =(ImageView)itemView.findViewById(R.id.image);
-
+            title = (TextView) itemView.findViewById(R.id.txt_title);
+            image = (ImageView) itemView.findViewById(R.id.image);
         }
-
     }
-
 }
